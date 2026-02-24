@@ -1,0 +1,170 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum MemberRole {
+  OWNER
+  MEMBER
+}
+
+enum ItemStatus {
+  FRESH
+  USE_SOON
+  EXPIRED
+}
+
+enum AlertType {
+  USE_SOON
+  EXPIRED
+}
+
+enum NotificationChannel {
+  EMAIL
+  IN_APP
+}
+
+enum NotificationStatus {
+  QUEUED
+  SENT
+  SKIPPED
+}
+
+enum AnalyticsEventType {
+  ITEM_OPENED
+  ITEM_CONSUMED
+  ITEM_EXPIRED
+  ITEM_ADDED
+}
+
+model User {
+  id               String            @id @default(cuid())
+  email            String            @unique
+  passwordHash     String
+  name             String
+  householdName    String?
+  prefsEmail       Boolean           @default(false)
+  prefsInApp       Boolean           @default(true)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  memberships      HouseholdMember[]
+  createdItems     Item[]            @relation("CreatedItems")
+  alerts           Alert[]
+  notificationLogs NotificationLog[]
+  analyticsEvents  AnalyticsEvent[]
+}
+
+model Household {
+  id             String            @id @default(cuid())
+  name           String
+  inviteCode     String            @unique
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  members        HouseholdMember[]
+  items          Item[]
+  alerts         Alert[]
+  analyticsEvents AnalyticsEvent[]
+}
+
+model HouseholdMember {
+  id          String    @id @default(cuid())
+  householdId String
+  userId      String
+  role        MemberRole
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([householdId, userId])
+  @@index([userId])
+}
+
+model Item {
+  id              String           @id @default(cuid())
+  householdId     String
+  createdByUserId String
+  name            String
+  category        String
+  quantity        String
+  dateAdded       DateTime
+  opened          Boolean?
+  openedAt        DateTime?
+  customFreshDays Int?
+  expiresAt       DateTime
+  daysRemaining   Int
+  status          ItemStatus       @default(FRESH)
+  confidence      Float            @default(0.55)
+  archivedAt      DateTime?
+  consumedAt      DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  household       Household        @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  createdBy       User             @relation("CreatedItems", fields: [createdByUserId], references: [id], onDelete: Cascade)
+  alerts          Alert[]
+  analyticsEvents AnalyticsEvent[]
+
+  @@index([householdId, status])
+  @@index([householdId, archivedAt])
+}
+
+model FreshnessRule {
+  id           String   @id @default(cuid())
+  category     String   @unique
+  unopenedDays Int
+  openedDays   Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Alert {
+  id          String   @id @default(cuid())
+  householdId String
+  userId      String
+  itemId      String
+  type        AlertType
+  message     String
+  readAt      DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  item        Item      @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  logs        NotificationLog[]
+
+  @@index([userId, createdAt])
+  @@index([itemId, type, readAt])
+}
+
+model NotificationLog {
+  id        String              @id @default(cuid())
+  userId    String
+  alertId   String?
+  channel   NotificationChannel
+  status    NotificationStatus
+  detail    String
+  createdAt DateTime            @default(now())
+  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  alert     Alert?              @relation(fields: [alertId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+}
+
+model AnalyticsEvent {
+  id          String             @id @default(cuid())
+  householdId String
+  itemId      String?
+  userId      String?
+  type        AnalyticsEventType
+  meta        Json?
+  createdAt   DateTime           @default(now())
+  household   Household          @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  item        Item?              @relation(fields: [itemId], references: [id], onDelete: SetNull)
+  user        User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([householdId, type, createdAt])
+  @@index([itemId])
+}

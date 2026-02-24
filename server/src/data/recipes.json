@@ -1,0 +1,57 @@
+[
+  {
+    "name": "Spinach Omelet",
+    "ingredients": ["spinach", "egg", "milk", "cheese"],
+    "shortSteps": [
+      "Whisk eggs with a splash of milk.",
+      "Saute spinach until wilted.",
+      "Pour eggs, fold with cheese, and cook until set."
+    ],
+    "timeEstimate": "15 min"
+  },
+  {
+    "name": "Creamy Pasta Bake",
+    "ingredients": ["milk", "cheese", "leftovers", "pasta"],
+    "shortSteps": [
+      "Mix cooked pasta with chopped leftovers and milk.",
+      "Top with cheese and bake until golden."
+    ],
+    "timeEstimate": "30 min"
+  },
+  {
+    "name": "Vegetable Stir Fry",
+    "ingredients": ["spinach", "broccoli", "carrot", "onion"],
+    "shortSteps": [
+      "Heat oil in a pan and add sliced vegetables.",
+      "Cook on high heat with soy sauce for 6-8 minutes."
+    ],
+    "timeEstimate": "20 min"
+  },
+  {
+    "name": "Chicken Lettuce Wraps",
+    "ingredients": ["chicken", "onion", "lettuce", "carrot"],
+    "shortSteps": [
+      "Cook minced chicken with chopped onion and carrot.",
+      "Season and spoon into lettuce leaves."
+    ],
+    "timeEstimate": "25 min"
+  },
+  {
+    "name": "Berry Yogurt Parfait",
+    "ingredients": ["yogurt", "milk", "berries", "oats"],
+    "shortSteps": [
+      "Layer yogurt, berries, and oats in a glass.",
+      "Serve chilled."
+    ],
+    "timeEstimate": "10 min"
+  },
+  {
+    "name": "Leftover Rice Frittata",
+    "ingredients": ["leftovers", "egg", "spinach", "cheese"],
+    "shortSteps": [
+      "Mix leftovers with eggs and chopped spinach.",
+      "Cook in skillet and finish under broiler with cheese."
+    ],
+    "timeEstimate": "20 min"
+  }
+]
