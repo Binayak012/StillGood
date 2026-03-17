@@ -35,15 +35,11 @@ export function OnboardingOverlay({ userId, householdName }: OnboardingOverlayPr
   const [stepIndex, setStepIndex] = useState(0);
 
   useEffect(() => {
-    const storageKey = `stillgood:onboarding:${userId}:v1`;
-    const seen = window.localStorage.getItem(storageKey);
-    if (!seen) {
-      setOpen(true);
-    }
+    setStepIndex(0);
+    setOpen(true);
   }, [userId]);
 
   const dismiss = () => {
-    window.localStorage.setItem(`stillgood:onboarding:${userId}:v1`, "seen");
     setOpen(false);
   };
 
