@@ -1,6 +1,8 @@
 import bcrypt from "bcryptjs";
-import { PrismaClient, ItemStatus, AnalyticsEventType, AlertType } from "@prisma/client";
+import prismaPkg from "@prisma/client";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+
+const { PrismaClient } = prismaPkg;
 
 const databaseUrl = process.env.DATABASE_URL ?? "file:./dev.db";
 const prisma = new PrismaClient({
@@ -19,15 +21,18 @@ function addDays(date: Date, days: number): Date {
   return d;
 }
 
-function calcStatus(expiresAt: Date, now: Date): { status: ItemStatus; daysRemaining: number } {
+function calcStatus(
+  expiresAt: Date,
+  now: Date
+): { status: "FRESH" | "USE_SOON" | "EXPIRED"; daysRemaining: number } {
   const dayDiff = Math.floor((utcDay(expiresAt).getTime() - utcDay(now).getTime()) / 86_400_000);
   if (dayDiff < 0) {
-    return { status: ItemStatus.EXPIRED, daysRemaining: dayDiff };
+    return { status: "EXPIRED", daysRemaining: dayDiff };
   }
   if (dayDiff <= 2) {
-    return { status: ItemStatus.USE_SOON, daysRemaining: dayDiff };
+    return { status: "USE_SOON", daysRemaining: dayDiff };
   }
-  return { status: ItemStatus.FRESH, daysRemaining: dayDiff };
+  return { status: "FRESH", daysRemaining: dayDiff };
 }
 
 async function main() {
@@ -144,8 +149,8 @@ async function main() {
     })
   ]);
 
-  const expiredItem = items.find((item) => item.status === ItemStatus.EXPIRED);
-  const useSoonItem = items.find((item) => item.status === ItemStatus.USE_SOON);
+  const expiredItem = items.find((item) => item.status === "EXPIRED");
+  const useSoonItem = items.find((item) => item.status === "USE_SOON");
 
   if (expiredItem) {
     const alert = await prisma.alert.create({
@@ -153,7 +158,7 @@ async function main() {
         householdId: household.id,
         userId: demoUser.id,
         itemId: expiredItem.id,
-        type: AlertType.EXPIRED,
+        type: "EXPIRED",
         message: `${expiredItem.name} has expired.`
       }
     });
@@ -174,7 +179,7 @@ async function main() {
         householdId: household.id,
         userId: demoUser.id,
         itemId: useSoonItem.id,
-        type: AlertType.USE_SOON,
+        type: "USE_SOON",
         message: `${useSoonItem.name} should be used soon.`
       }
     });
@@ -187,28 +192,28 @@ async function main() {
         householdId: household.id,
         itemId: items[0].id,
         userId: demoUser.id,
-        type: AnalyticsEventType.ITEM_ADDED,
+        type: "ITEM_ADDED",
         createdAt: addDays(weekStart, 1)
       },
       {
         householdId: household.id,
         itemId: items[1].id,
         userId: demoUser.id,
-        type: AnalyticsEventType.ITEM_ADDED,
+        type: "ITEM_ADDED",
         createdAt: addDays(weekStart, 2)
       },
       {
         householdId: household.id,
         itemId: items[1].id,
         userId: demoUser.id,
-        type: AnalyticsEventType.ITEM_CONSUMED,
+        type: "ITEM_CONSUMED",
         createdAt: addDays(weekStart, 4)
       },
       {
         householdId: household.id,
         itemId: items[2].id,
         userId: demoUser.id,
-        type: AnalyticsEventType.ITEM_EXPIRED,
+        type: "ITEM_EXPIRED",
         createdAt: addDays(weekStart, 5)
       }
     ]

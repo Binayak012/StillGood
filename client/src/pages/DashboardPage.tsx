@@ -164,7 +164,7 @@ export function DashboardPage() {
                     <td>{item.category}</td>
                     <td>{item.quantity}</td>
                     <td>
-                      <StatusBadge status={item.status} />
+                      <StatusBadge status={item.status} opened={item.opened} />
                     </td>
                     <td>{item.daysRemaining}</td>
                     <td>
@@ -173,9 +173,10 @@ export function DashboardPage() {
                           <>
                             <button
                               className="button tiny"
+                              disabled={item.opened === true}
                               onClick={() => void runItemAction(() => api.openItem(item.id).then(() => undefined))}
                             >
-                              Open
+                              {item.opened === true ? "Opened" : "Open"}
                             </button>
                             <button
                               className="button tiny secondary"
