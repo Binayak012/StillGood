@@ -1684,6 +1684,8 @@ tr.row-expired td:first-child {
 
   .onboarding-shell {
     border-radius: 20px;
+    max-height: calc(100vh - 24px);
+    overflow-y: auto;
   }
 
   .onboarding-stage {
@@ -1697,7 +1699,7 @@ tr.row-expired td:first-child {
   }
 
   .onboarding-visual {
-    min-height: 260px;
+    min-height: 180px;
   }
 
   .onboarding-rail {
