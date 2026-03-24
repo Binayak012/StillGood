@@ -68,12 +68,12 @@ async function submitToTabScanner(buffer: Buffer, mimetype: string, filename: st
   });
 
   if (!res.ok) {
-    throw new AppError(`TabScanner submission failed: ${res.status}`, 502);
+    throw new AppError(502, "TABSCANNER_ERROR", `TabScanner submission failed: ${res.status}`);
   }
 
   const data = (await res.json()) as { success?: boolean; token?: string; message?: string };
   if (!data.success || !data.token) {
-    throw new AppError(data.message ?? "TabScanner did not return a token", 502);
+    throw new AppError(502, "TABSCANNER_ERROR", data.message ?? "TabScanner did not return a token");
   }
   return data.token;
 }
@@ -86,14 +86,14 @@ async function pollTabScanner(token: string): Promise<TabScannerResult> {
       headers: { apikey: env.TABSCANNER_API_KEY! }
     });
 
-    if (!res.ok) throw new AppError(`TabScanner poll failed: ${res.status}`, 502);
+    if (!res.ok) throw new AppError(502, "TABSCANNER_ERROR", `TabScanner poll failed: ${res.status}`);
 
     const data = (await res.json()) as { status?: string; result?: TabScannerResult; message?: string };
 
     if (data.status === "done" && data.result) return data.result;
-    if (data.status === "failed") throw new AppError("TabScanner processing failed", 502);
+    if (data.status === "failed") throw new AppError(502, "TABSCANNER_ERROR", "TabScanner processing failed");
   }
-  throw new AppError("Receipt processing timed out", 504);
+  throw new AppError(504, "TABSCANNER_TIMEOUT", "Receipt processing timed out");
 }
 
 export const receiptsRouter = Router();
@@ -105,10 +105,10 @@ receiptsRouter.post(
   upload.single("receipt"),
   asyncHandler(async (req, res) => {
     if (!env.TABSCANNER_API_KEY) {
-      throw new AppError("TabScanner API key is not configured", 503);
+      throw new AppError(503, "TABSCANNER_NOT_CONFIGURED", "TabScanner API key is not configured");
     }
     if (!req.file) {
-      throw new AppError("No receipt image provided", 400);
+      throw new AppError(400, "MISSING_FILE", "No receipt image provided");
     }
 
     const token = await submitToTabScanner(req.file.buffer, req.file.mimetype, req.file.originalname || "receipt.jpg");
