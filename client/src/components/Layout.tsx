@@ -4,62 +4,58 @@ import { OnboardingOverlay } from "./OnboardingOverlay";
 import { StillGoodLogo } from "./StillGoodLogo";
 
 const links = [
-  { to: "/", label: "Dashboard", kicker: "DB" },
-  { to: "/add-item", label: "Add Item", kicker: "AI" },
-  { to: "/notifications", label: "Notifications", kicker: "NT" },
-  { to: "/analytics", label: "Analytics", kicker: "AN" },
-  { to: "/integrations", label: "Integrations", kicker: "IN" },
-  { to: "/settings", label: "Settings", kicker: "ST" }
+  { to: "/", label: "Dashboard", end: true },
+  { to: "/add-item", label: "Add Item" },
+  { to: "/notifications", label: "Notifications" },
+  { to: "/analytics", label: "Analytics" },
+  { to: "/integrations", label: "Integrations" },
+  { to: "/settings", label: "Settings" }
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const { user, household, logout } = useAuth();
 
   return (
-    <div className="app-background">
-      {user ? <OnboardingOverlay userId={user.id} householdName={household?.name ?? null} /> : null}
-      <div className="ambient-orb orb-a" />
-      <div className="ambient-orb orb-b" />
-      <div className="ambient-grid" />
-
-      <div className="app-shell">
-        <header className="topbar">
-          <div className="brand-lockup">
-            <StillGoodLogo className="logo-mark" />
-            <div className="brand-meta">
-              <div className="brand-title-row">
-                <h1>StillGood</h1>
-                <span className="brand-tag">Prototype</span>
-              </div>
-              <p>Freshness intelligence for everyday kitchens</p>
-            </div>
+    <div className="app-layout">
+      <aside className="sidebar">
+        <div className="sidebar-brand">
+          <StillGoodLogo className="logo-mark" />
+          <div className="sidebar-brand-meta">
+            <strong>StillGood</strong>
+            <span className="brand-tag">Prototype</span>
           </div>
+        </div>
 
-          <div className="topbar-actions">
-            <div className="household-pill">
-              <span>Household</span>
-              <strong>{household?.name ?? "Not set"}</strong>
-            </div>
-            <div className="user-chip">{user?.name}</div>
-            <button className="button ghost logout" onClick={() => void logout()}>
-              Log out
-            </button>
-          </div>
-        </header>
-
-        <nav className="nav-grid">
+        <nav className="sidebar-nav">
           {links.map((link) => (
             <NavLink
               key={link.to}
               to={link.to}
-              className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}
+              end={link.end}
+              className={({ isActive }) => `sidebar-link${isActive ? " active" : ""}`}
             >
-              <span className="nav-kicker">{link.kicker}</span>
-              <span>{link.label}</span>
+              <span className="sidebar-link-dot" />
+              {link.label}
             </NavLink>
           ))}
         </nav>
 
+        <div className="sidebar-footer">
+          <div className="sidebar-user">
+            <div className="sidebar-avatar">{user?.name?.[0]?.toUpperCase() ?? "?"}</div>
+            <div className="sidebar-user-meta">
+              <strong>{user?.name}</strong>
+              <span>{household?.name ?? "No household"}</span>
+            </div>
+          </div>
+          <button className="button ghost sidebar-logout" onClick={() => void logout()}>
+            Log out
+          </button>
+        </div>
+      </aside>
+
+      <div className="main-area">
+        {user ? <OnboardingOverlay userId={user.id} householdName={household?.name ?? null} /> : null}
         <main className="content">{children}</main>
       </div>
     </div>
