@@ -5,6 +5,7 @@ import { AddItemPage } from "./pages/AddItemPage";
 import { AnalyticsPage } from "./pages/AnalyticsPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { IntegrationsPage } from "./pages/IntegrationsPage";
+import { ReceiptScanPage } from "./pages/ReceiptScanPage";
 import { LoginPage } from "./pages/LoginPage";
 import { NotificationsPage } from "./pages/NotificationsPage";
 import { RegisterPage } from "./pages/RegisterPage";
@@ -37,6 +38,7 @@ export function App() {
         <Route path="/notifications" element={<NotificationsPage />} />
         <Route path="/analytics" element={<AnalyticsPage />} />
         <Route path="/integrations" element={<IntegrationsPage />} />
+        <Route path="/scan-receipt" element={<ReceiptScanPage />} />
         <Route path="/settings" element={<SettingsPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

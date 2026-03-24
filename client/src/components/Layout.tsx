@@ -16,48 +16,47 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const { user, household, logout } = useAuth();
 
   return (
-    <div className="app-layout">
-      <aside className="sidebar">
-        <div className="sidebar-brand">
+    <div className="app-shell">
+      {user ? <OnboardingOverlay userId={user.id} householdName={household?.name ?? null} /> : null}
+
+      <header className="topbar">
+        <div className="brand-lockup">
           <StillGoodLogo className="logo-mark" />
-          <div className="sidebar-brand-meta">
-            <strong>StillGood</strong>
-            <span className="brand-tag">Prototype</span>
+          <div className="brand-meta">
+            <div className="brand-title-row">
+              <h1>StillGood</h1>
+              <span className="brand-tag">Prototype</span>
+            </div>
+            <p>Freshness intelligence for everyday kitchens</p>
           </div>
         </div>
 
-        <nav className="sidebar-nav">
-          {links.map((link) => (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              end={link.end}
-              className={({ isActive }) => `sidebar-link${isActive ? " active" : ""}`}
-            >
-              <span className="sidebar-link-dot" />
-              {link.label}
-            </NavLink>
-          ))}
-        </nav>
-
-        <div className="sidebar-footer">
-          <div className="sidebar-user">
-            <div className="sidebar-avatar">{user?.name?.[0]?.toUpperCase() ?? "?"}</div>
-            <div className="sidebar-user-meta">
-              <strong>{user?.name}</strong>
-              <span>{household?.name ?? "No household"}</span>
-            </div>
+        <div className="topbar-actions">
+          <div className="household-pill">
+            <span>Household</span>
+            <strong>{household?.name ?? "Not set"}</strong>
           </div>
-          <button className="button ghost sidebar-logout" onClick={() => void logout()}>
+          <div className="user-chip">{user?.name}</div>
+          <button className="button ghost" onClick={() => void logout()}>
             Log out
           </button>
         </div>
-      </aside>
+      </header>
 
-      <div className="main-area">
-        {user ? <OnboardingOverlay userId={user.id} householdName={household?.name ?? null} /> : null}
-        <main className="content">{children}</main>
-      </div>
+      <nav className="nav-grid">
+        {links.map((link) => (
+          <NavLink
+            key={link.to}
+            to={link.to}
+            end={link.end}
+            className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}
+          >
+            {link.label}
+          </NavLink>
+        ))}
+      </nav>
+
+      <main className="content">{children}</main>
     </div>
   );
 }

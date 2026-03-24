@@ -47,6 +47,12 @@ export interface Alert {
   };
 }
 
+export interface ScannedItem {
+  name: string;
+  category: string;
+  quantity: string;
+}
+
 export interface RecipeSuggestion {
   name: string;
   image: string | null;
@@ -91,6 +97,19 @@ interface ApiErrorPayload {
 }
 
 const API_BASE = "/api";
+
+async function apiUpload<T>(path: string, body: FormData): Promise<T> {
+  const response = await fetch(`${API_BASE}${path}`, {
+    method: "POST",
+    credentials: "include",
+    cache: "no-store",
+    body
+  });
+  if (response.status === 204) return undefined as T;
+  const data = (await response.json().catch(() => ({}))) as { error?: { message?: string } } & T;
+  if (!response.ok) throw new Error((data as { error?: { message?: string } }).error?.message ?? "Request failed");
+  return data as T;
+}
 
 async function apiRequest<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, {
@@ -164,6 +183,7 @@ export const api = {
     quantity: string;
     opened: boolean | null;
     customFreshDays?: number | null;
+    dateAdded?: string;
   }) =>
     apiRequest<{ item: Item }>("/items", {
       method: "POST",
@@ -213,5 +233,10 @@ export const api = {
   analyticsEvents: (range: "week" | "month") =>
     apiRequest<AnalyticsEvents>(`/analytics/events?range=${range}`),
   integrationsStatus: () =>
-    apiRequest<{ title: string; connected: boolean; description: string }>("/integrations/status")
+    apiRequest<{ title: string; connected: boolean; description: string }>("/integrations/status"),
+  scanReceipt: (file: File) => {
+    const form = new FormData();
+    form.append("receipt", file);
+    return apiUpload<{ items: ScannedItem[]; store: string | null; date: string | null }>("/receipts/scan", form);
+  }
 };

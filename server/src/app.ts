@@ -9,6 +9,7 @@ import { alertsRouter } from "./modules/alerts/alerts.routes.js";
 import { analyticsRouter } from "./modules/analytics/analytics.routes.js";
 import { recipesRouter } from "./modules/recipes/recipes.routes.js";
 import { integrationsRouter } from "./modules/integrations/integrations.routes.js";
+import { receiptsRouter } from "./modules/receipts/receipts.routes.js";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
 
 export const app = express();
@@ -37,6 +38,7 @@ app.use("/api/alerts", alertsRouter);
 app.use("/api/analytics", analyticsRouter);
 app.use("/api/recipes", recipesRouter);
 app.use("/api/integrations", integrationsRouter);
+app.use("/api/receipts", receiptsRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
