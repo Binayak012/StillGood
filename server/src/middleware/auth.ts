@@ -15,19 +15,21 @@ export function signToken(userId: string): string {
 }
 
 export function setAuthCookie(res: Response, token: string): void {
+  const isProd = env.NODE_ENV === "production";
   res.cookie(AUTH_COOKIE_NAME, token, {
     httpOnly: true,
-    secure: env.NODE_ENV === "production",
-    sameSite: "lax",
+    secure: isProd,
+    sameSite: isProd ? "none" : "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000
   });
 }
 
 export function clearAuthCookie(res: Response): void {
+  const isProd = env.NODE_ENV === "production";
   res.clearCookie(AUTH_COOKIE_NAME, {
     httpOnly: true,
-    secure: env.NODE_ENV === "production",
-    sameSite: "lax"
+    secure: isProd,
+    sameSite: isProd ? "none" : "lax"
   });
 }
 
